@@ -1,0 +1,27 @@
+// proto/order.proto（放在项目根目录）
+syntax = "proto3"; // 用 ProtoBuf 3 语法（最新稳定版）
+
+package order; // 包名：避免接口名冲突（比如不同服务都有 GetInfo 方法）
+
+// 1. 定义“查用户订单”的请求格式（必须传 user_id）
+message GetUserOrdersRequest {
+  int32 user_id = 1; // 1 是“字段编号”（不是值），用于二进制传输时识别字段
+}
+
+// 2. 定义“查用户订单”的响应格式（返回订单列表）
+message Order { // 嵌套消息：订单详情
+  int64 order_id = 1;
+  int32 user_id = 2;
+  int32 goods_id = 3;
+  float amount = 4;
+  string status = 5; // 订单状态："PAID"（已支付）、"PENDING"（待支付）
+}
+message GetUserOrdersResponse {
+  repeated Order orders = 1; // repeated：表示“数组”（多个订单）
+}
+
+// 3. 定义“订单服务”的接口（包含哪些方法）
+service OrderService {
+  // 方法名：GetUserOrders；请求：GetUserOrdersRequest；响应：GetUserOrdersResponse
+  rpc GetUserOrders(GetUserOrdersRequest) returns (GetUserOrdersResponse);
+}
